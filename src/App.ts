@@ -1,14 +1,10 @@
 import "./style.css";
 
 import * as PIXI from "pixi.js";
-import { lerp } from "./lerp";
-
+import { lerp } from "./utils/lerp";
 import Stats from "stats.js";
-
-// import { BoxEntity } from "./BoxEntity";
 import { PlayerEntity } from "./PlayerEntity";
 import { keyboardEvents } from "./keyboardEvents";
-import { getAngleBetweenTwoPoints } from "./utils/getAngle";
 
 var stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -35,13 +31,13 @@ export class App {
       this.state.mouseY = e.y;
     });
 
-    keyboardEvents(this);
+    keyboardEvents({ app: this });
 
     // Add some stuff to the ticker
     this.pixi.ticker.add((delta) => {
       stats.begin();
 
-      this.player.update(delta, this.state);
+      this.player.update({ delta, app: this });
 
       // console.log("app state -->", JSON.parse(JSON.stringify(this.state)));
 
@@ -98,6 +94,7 @@ export class App {
     };
 
     const pixiInstance = new PIXI.Application(config);
+    pixiInstance.stage.sortableChildren = true;
 
     parentEl.appendChild(pixiInstance.view);
 
