@@ -58,10 +58,9 @@ export class Asteroid {
   rotationSpeed;
   hasBeenInView;
 
-  isOutOfViewport = false;
-
-  removeFromStage(app: App) {
+  destroy(app: App) {
     app.pixi.stage.removeChild(this.entity);
+    app.asteroids = app.asteroids.filter((asteroid) => asteroid !== this);
   }
 
   update({ delta, app }: { delta: number; app: App }) {
@@ -70,16 +69,16 @@ export class Asteroid {
     this.entity.y += getAngleY(this.speed, this.direction) * delta;
 
     // Remove from scene if been on screen once then becomes off screen
-    const offScreenX = this.entity.x > window.innerWidth || this.entity.x < 0;
-    const offScreenY = this.entity.y > window.innerHeight || this.entity.y < 0;
+    const offScreenX = this.entity.x > app.pixi.screen.width || this.entity.x < 0;
+    const offScreenY = this.entity.y > app.pixi.screen.height || this.entity.y < 0;
     const isOutOfViewport = offScreenX || offScreenY;
 
     if (!isOutOfViewport) {
       this.hasBeenInView = true;
     }
 
-    if (this.hasBeenInView) {
-      this.isOutOfViewport = offScreenX || offScreenY;
+    if (this.hasBeenInView && isOutOfViewport) {
+      this.destroy(app);
     }
   }
 }
