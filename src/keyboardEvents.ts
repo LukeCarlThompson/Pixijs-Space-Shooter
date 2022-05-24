@@ -1,6 +1,6 @@
-import type { App } from "./App";
+import type { App } from './App';
 
-export const keyboardEvents = (app: App) => {
+export const keyboardEvents = ({ app }: { app: App }) => {
   let timeoutCancel: number;
   let intervalIncrease: number;
   let intervalDecrease: number;
@@ -17,8 +17,8 @@ export const keyboardEvents = (app: App) => {
     app.state.decreaseThrust();
   };
 
-  window.addEventListener("keydown", (e) => {
-    if (e.code === "Space") {
+  window.addEventListener('keydown', (e) => {
+    if (e.code === 'Space') {
       clearTimeout(timeoutCancel);
       clearTimeout(intervalIncrease);
       app.state.increaseThrust();
@@ -27,8 +27,8 @@ export const keyboardEvents = (app: App) => {
     }
   });
 
-  window.addEventListener("keyup", (e) => {
-    if (e.code === "Space") {
+  window.addEventListener('keyup', (e) => {
+    if (e.code === 'Space') {
       clearTimeout(intervalDecrease);
       clearTimeout(intervalIncrease);
       intervalDecrease = setTimeout(decreaseThrust, 200);

@@ -1,10 +1,10 @@
-import "./style.css";
+import './style.css';
 
-import * as PIXI from "pixi.js";
-import { lerp } from "./utils/lerp";
-import Stats from "stats.js";
-import { PlayerEntity } from "./PlayerEntity";
-import { keyboardEvents } from "./keyboardEvents";
+import * as PIXI from 'pixi.js';
+import { lerp } from './utils/lerp';
+import Stats from 'stats.js';
+import { PlayerEntity } from './PlayerEntity';
+import { keyboardEvents } from './keyboardEvents';
 
 var stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -24,7 +24,7 @@ export class App {
     this.player = new PlayerEntity(this);
 
     // Add listeners
-    window.addEventListener("mousemove", (e) => {
+    window.addEventListener('mousemove', (e) => {
       this.state.velocityX = lerp(this.state.velocityX, Math.abs(this.state.mouseX - e.x), 0.1) * 0.5;
       this.state.mouseX = e.x;
       this.state.velocityY = lerp(this.state.velocityY, Math.abs(this.state.mouseY - e.y), 0.1);
