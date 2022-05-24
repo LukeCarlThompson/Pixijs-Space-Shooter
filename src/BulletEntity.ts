@@ -45,8 +45,8 @@ export class BulletEntity {
     this.entity.y += getAngleY(this.speed, this.rotation) * delta;
 
     // Remove from scene if off screen
-    const offScreenX = this.entity.x > window.innerWidth || this.entity.x < 0;
-    const offScreenY = this.entity.y > window.innerHeight || this.entity.y < 0;
+    const offScreenX = this.entity.x > app.pixi.screen.width || this.entity.x < 0;
+    const offScreenY = this.entity.y > app.pixi.screen.height || this.entity.y < 0;
     this.isOutOfViewport = offScreenX || offScreenY;
   }
 }
