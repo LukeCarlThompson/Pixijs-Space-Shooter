@@ -4,7 +4,9 @@ import * as PIXI from 'pixi.js';
 import { lerp } from './utils/lerp';
 import Stats from 'stats.js';
 import { PlayerEntity } from './PlayerEntity';
+import { BackgroundEntity } from './Background';
 import { keyboardEvents } from './keyboardEvents';
+import { Asteroid } from './Asteroid';
 
 var stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -15,13 +17,30 @@ const constants = {
   maxLevel: 3,
 };
 
+declare global {
+  interface Window {
+    PIXI: PIXI.Application;
+  }
+}
+
 export class App {
   constructor(parentEl: HTMLDivElement) {
     // Create pixi instance
     this.pixi = this._CreatePixi(parentEl);
 
+    // Add pixi to window for devtools
+    // TODO: Set this up to only run in dev mode
+    window.PIXI = this.pixi;
+
+    // Add background
+    this.background = new BackgroundEntity(this);
+
     // Create our player and add to the scene
     this.player = new PlayerEntity(this);
+
+    // Add an asteroid
+    // TODO: Make a class to control generation of asteroids over time
+    this.asteroids = [new Asteroid({ app: this })];
 
     // Add listeners
     window.addEventListener('mousemove', (e) => {
@@ -38,6 +57,11 @@ export class App {
       stats.begin();
 
       this.player.update({ delta, app: this });
+      this.background.update({ delta, app: this });
+
+      this.asteroids.forEach((asteroid) => {
+        asteroid.update({ delta, app: this });
+      });
 
       // console.log("app state -->", JSON.parse(JSON.stringify(this.state)));
 
@@ -48,6 +72,8 @@ export class App {
   pixi;
 
   player;
+  asteroids;
+  background;
 
   state = {
     mouseX: 0,
