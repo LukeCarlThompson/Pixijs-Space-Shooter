@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js';
 import type { App } from './App';
 import { getAngleX, getAngleY } from './utils/getAngle';
+import { isInsideRectangle } from './utils/isInsideRectangle';
 
 export class BulletEntity {
   constructor(speed: number, rotation: number, app: App) {
@@ -35,8 +36,9 @@ export class BulletEntity {
 
   isOutOfViewport = false;
 
-  removeFromStage(app: App) {
+  destroy(app: App) {
     app.pixi.stage.removeChild(this.entity);
+    app.player.bullets = app.player.bullets.filter((item) => item !== this);
   }
 
   update({ delta, app }: { delta: number; app: App }) {
@@ -44,9 +46,11 @@ export class BulletEntity {
     this.entity.x += getAngleX(this.speed, this.rotation) * delta;
     this.entity.y += getAngleY(this.speed, this.rotation) * delta;
 
-    // Remove from scene if off screen
-    const offScreenX = this.entity.x > app.pixi.screen.width || this.entity.x < 0;
-    const offScreenY = this.entity.y > app.pixi.screen.height || this.entity.y < 0;
-    this.isOutOfViewport = offScreenX || offScreenY;
+    // Check if it is still on the screen
+    this.isOutOfViewport = !isInsideRectangle({ x: this.entity.x, y: this.entity.y, rectangle: app.pixi.screen });
+
+    if (this.isOutOfViewport) {
+      this.destroy(app);
+    }
   }
 }

@@ -109,10 +109,6 @@ export class PlayerEntity {
     // Update the bullets
     this.bullets.forEach((bullet) => {
       bullet.update({ delta, app });
-      if (bullet.isOutOfViewport) {
-        bullet.removeFromStage(app);
-        this.bullets = this.bullets.filter((item) => item !== bullet);
-      }
     });
   }
 }
