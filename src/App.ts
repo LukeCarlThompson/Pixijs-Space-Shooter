@@ -6,7 +6,7 @@ import Stats from 'stats.js';
 import { PlayerEntity } from './PlayerEntity';
 import { BackgroundEntity } from './Background';
 import { keyboardEvents } from './keyboardEvents';
-import { Asteroid } from './Asteroid';
+import { AsteroidGenerator } from './AsteroidGenerator';
 
 var stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -38,9 +38,9 @@ export class App {
     // Create our player and add to the scene
     this.player = new PlayerEntity(this);
 
-    // Add an asteroid
-    // TODO: Make a class to control generation of asteroids over time
-    this.asteroids = [new Asteroid({ app: this })];
+    // Start the asteroid generator
+    this.asteroidGenerator = new AsteroidGenerator({ app: this });
+    this.asteroidGenerator.start();
 
     // Add listeners
     window.addEventListener('mousemove', (e) => {
@@ -59,9 +59,7 @@ export class App {
       this.player.update({ delta, app: this });
       this.background.update({ delta, app: this });
 
-      this.asteroids.forEach((asteroid) => {
-        asteroid.update({ delta, app: this });
-      });
+      this.asteroidGenerator.update({ delta, app: this });
 
       // console.log("app state -->", JSON.parse(JSON.stringify(this.state)));
 
@@ -72,7 +70,7 @@ export class App {
   pixi;
 
   player;
-  asteroids;
+  asteroidGenerator;
   background;
 
   state = {
@@ -83,6 +81,8 @@ export class App {
     playerX: 0,
     playerY: 0,
     playerAngleToMouse: 0,
+
+    asteroidFrequency: 2000,
 
     thrustAngle: 1.5,
     _thrust: 0,
