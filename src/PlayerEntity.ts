@@ -52,6 +52,7 @@ export class PlayerEntity {
 
     // Listen for clicks and shoot
     window.addEventListener('mousedown', () => {
+      clearInterval(this.shootInterval);
       this.shoot(app);
       this.shootInterval = setInterval(shootBullet, 100);
     });
