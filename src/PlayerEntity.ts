@@ -2,46 +2,63 @@ import * as PIXI from 'pixi.js';
 import { lerp } from './utils/lerp';
 import type { App } from './App';
 import { getAngleX, getAngleY } from './utils/getAngle';
-import imagepath from './images/Spaceship_Asset.png';
 import { getAngleBetweenTwoPoints } from './utils/getAngle';
 import { BulletEntity } from './BulletEntity';
+import { playerKeyboardEvents } from './playerKeyboardEvents';
 
 const spriteCoords = {
   x: [0, 64, 128],
   y: [0, 64, 128, 192],
 };
 
+const constants = {
+  maxThrust: 10,
+  maxLevel: 3,
+};
+
 export class PlayerEntity {
   constructor(app: App) {
+    // Set up some state
+    this.state = {
+      velocity: { x: 0, y: 0 },
+      idealPosition: { x: app.pixi.screen.width / 2, y: app.pixi.screen.height / 2 },
+      prevPosition: {
+        x: app.pixi.screen.width / 2,
+        y: app.pixi.screen.height / 2,
+      },
+      angleToMouse: 0,
+      thrustAngle: 1.5,
+      _thrust: 0,
+      get thrust() {
+        return this._thrust;
+      },
+      set thrust(value: number) {
+        this.thrustAngle = this.angleToMouse;
+        value <= constants.maxThrust ? (this._thrust = value) : null;
+      },
+      _level: 0,
+      get level() {
+        return this._level;
+      },
+      set level(value: number) {
+        value <= constants.maxLevel ? (this._level = value) : null;
+      },
+    };
+
     // create a new Sprite from an image texture
-    const texture = PIXI.Texture.from(imagepath);
+    const texture = app.pixi.loader.resources.ship.texture || PIXI.Texture.EMPTY;
     texture.trim = new PIXI.Rectangle(0, 0, 100, 120);
-    texture.frame = new PIXI.Rectangle();
     texture.frame.x = spriteCoords.x[0];
-    texture.frame.y = spriteCoords.y[app.state.level];
-    texture.frame.width = 61;
+    texture.frame.y = spriteCoords.y[this.state.level];
+    texture.frame.width = 64;
     texture.frame.height = 64;
     texture.updateUvs();
 
     this.texture = texture;
     const ship = PIXI.Sprite.from(texture);
-
-    // center the sprite's anchor point
-    ship.anchor.set(50, 60);
-
-    // Center this ship
-    const centerX = app.pixi.screen.width / 2;
-    const centerY = app.pixi.screen.height / 2;
-    ship.x = centerX;
-    ship.y = centerY;
-    app.state.playerX = centerX;
-    app.state.playerY = centerY;
-
-    this._prevPosition = {
-      x: centerX,
-      y: centerY,
-    };
-
+    ship.x = this.state.idealPosition.x;
+    ship.y = this.state.idealPosition.y;
+    ship.anchor.set(0.78, 0.9);
     ship.zIndex = 10;
 
     this.entity = ship;
@@ -50,67 +67,80 @@ export class PlayerEntity {
 
     app.pixi.stage.addChild(ship);
 
+    this.shoot = () => {
+      this.bullets.push(new BulletEntity(15, this.entity.rotation - 1.5, app));
+    };
+
     // Create an array for the bullets
     this.bullets = [];
 
-    this.shootInterval = 0;
-
-    // TODO: fix memory leak when shooting
-    const shootBullet = () => {
-      this.shoot(app);
-    };
+    this._shootInterval = 0;
 
     // Listen for clicks and shoot
     window.addEventListener('mousedown', () => {
-      clearInterval(this.shootInterval);
-      this.shoot(app);
-      this.shootInterval = setInterval(shootBullet, 100);
+      clearInterval(this._shootInterval);
+      this.shoot();
+      this._shootInterval = setInterval(this.shoot, 100);
     });
 
-    // Listen for clicks and shoot
+    // Listen for mouse up and stop shooting
     window.addEventListener('mouseup', () => {
-      clearInterval(this.shootInterval);
+      clearInterval(this._shootInterval);
     });
+
+    playerKeyboardEvents({ player: this });
   }
 
   texture;
   entity;
   bullets: BulletEntity[];
-  shootInterval: number;
-  velocity: { x: number; y: number } = { x: 0, y: 0 };
-  _prevPosition: { x: number; y: number } = { x: 0, y: 0 };
+  state;
+  _shootInterval: number;
+  shoot;
 
-  shoot(app: App) {
-    this.bullets.push(new BulletEntity(15, this.entity.rotation - 1.5, app));
-  }
+  increaseThrust = () => {
+    this.state.thrustAngle = this.state.angleToMouse;
+    this.state.thrust++;
+  };
 
-  update({ delta, app }: { delta: number; app: App }) {
+  decreaseThrust = () => {
+    this.state.thrust !== 0 ? this.state.thrust-- : null;
+  };
+
+  cancelThrust = () => {
+    this.state.thrust = 0;
+  };
+
+  update = ({ delta, app }: { delta: number; app: App }) => {
     // Update sprites if thrust has changed
-    const limitedThrust = app.state.thrust >= spriteCoords.x.length - 1 ? spriteCoords.x.length - 1 : app.state.thrust;
+    const limitedThrust =
+      this.state.thrust >= spriteCoords.x.length - 1 ? spriteCoords.x.length - 1 : this.state.thrust;
     if (
       this.texture.frame.x !== spriteCoords.x[limitedThrust] ||
-      this.texture.frame.y !== spriteCoords.x[app.state.level]
+      this.texture.frame.y !== spriteCoords.x[this.state.level]
     ) {
       this.texture.frame.x = spriteCoords.x[limitedThrust];
-      this.texture.frame.y = spriteCoords.x[app.state.level];
+      this.texture.frame.y = spriteCoords.x[this.state.level];
       this.texture.updateUvs();
     }
 
     // Update position from app state
-    const currentPositionX = lerp(this.entity.position.x, app.state.playerX, delta * 0.01);
-    const currentPositionY = lerp(this.entity.position.y, app.state.playerY, delta * 0.01);
+    const currentPositionX = lerp(this.entity.position.x, this.state.idealPosition.x, delta * 0.01);
+    const currentPositionY = lerp(this.entity.position.y, this.state.idealPosition.y, delta * 0.01);
     this.entity.position.x = currentPositionX;
     this.entity.position.y = currentPositionY;
 
     // Update velocity state
-    this.velocity = { x: currentPositionX - this._prevPosition.x, y: currentPositionY - this._prevPosition.y };
+    this.state.velocity = {
+      x: currentPositionX - this.state.prevPosition.x,
+      y: currentPositionY - this.state.prevPosition.y,
+    };
 
     // Update prev position
-    this._prevPosition.x = currentPositionX;
-    this._prevPosition.y = currentPositionY;
+    this.state.prevPosition.x = currentPositionX;
+    this.state.prevPosition.y = currentPositionY;
 
     // Point ship towards mouse
-
     // TODO: Normalise the angle when it loops so I can lerp the values
     const angleToMouse = getAngleBetweenTwoPoints(
       app.state.mouseX,
@@ -118,16 +148,16 @@ export class PlayerEntity {
       currentPositionX,
       currentPositionY,
     );
-    app.state.playerAngleToMouse = angleToMouse;
-    this.entity.rotation = app.state.playerAngleToMouse + 1.5;
+    this.state.angleToMouse = angleToMouse;
+    this.entity.rotation = angleToMouse + 1.5;
 
     // Move ship if thrust is above 0
-    app.state.playerX += getAngleX(app.state.thrust, app.state.thrustAngle);
-    app.state.playerY += getAngleY(app.state.thrust, app.state.thrustAngle);
+    this.state.idealPosition.x += getAngleX(this.state.thrust, this.state.thrustAngle);
+    this.state.idealPosition.y += getAngleY(this.state.thrust, this.state.thrustAngle);
 
     // Update the bullets
     this.bullets.forEach((bullet) => {
       bullet.update({ delta, app });
     });
-  }
+  };
 }

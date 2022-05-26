@@ -1,7 +1,5 @@
 import './style.css';
 
-import { App } from './App';
+import { initApp } from './initApp';
 
-const canvas = document.querySelector<HTMLDivElement>('#canvas');
-
-canvas && new App(canvas);
+initApp();

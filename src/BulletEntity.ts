@@ -48,7 +48,12 @@ export class BulletEntity {
     this.entity.y += getAngleY(this.speed, this.rotation) * delta;
 
     // Check if it is still on the screen
-    this.isOutOfViewport = !isInsideRectangle({ x: this.entity.x, y: this.entity.y, rectangle: app.pixi.screen });
+    this.isOutOfViewport = !isInsideRectangle({
+      x: this.entity.x,
+      y: this.entity.y,
+      width: app.pixi.screen.width,
+      height: app.pixi.screen.height,
+    });
 
     if (this.isOutOfViewport) {
       this.destroy(app);

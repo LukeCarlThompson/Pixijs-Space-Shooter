@@ -4,46 +4,47 @@ import { Asteroid } from './Asteroid';
 
 interface AsteroidGeneratorProps {
   app: App;
+  frequency: number;
 }
 
 export class AsteroidGenerator {
-  constructor({ app }: AsteroidGeneratorProps) {
+  constructor({ app, frequency }: AsteroidGeneratorProps) {
     this.asteroids = [];
-
-    this.createAsteroid = () => {
-      const newAsteroid = new Asteroid({ position: { x: getRandomArbitrary(0, app.pixi.screen.width), y: -20 }, app });
-      this.asteroids.push(newAsteroid);
+    this.state = {
+      frequency: frequency,
+      isRunning: false,
     };
 
-    this.start = () => {
-      this.isRunning = true;
-      this.createAsteroid();
-
-      if (this.isRunning) {
-        clearTimeout(this.asteroidTimeout);
-
-        // BUG: Figure out why this hides all the asteroids
-        this.asteroidTimeout = setTimeout(this.start, Math.random() * app.state.asteroidFrequency + 300);
-      }
+    this.createAsteroid = () => {
+      const newAsteroid = new Asteroid({ position: { x: getRandomArbitrary(0, app.pixi.screen.width), y: -100 }, app });
+      this.asteroids.push(newAsteroid);
     };
   }
 
   asteroids: Asteroid[];
-  isRunning = false;
-  asteroidTimeout = 0;
+  _asteroidTimeout = 0;
   createAsteroid;
+  state;
 
-  start;
+  start = () => {
+    this.state.isRunning = true;
+    this.createAsteroid();
 
-  stop() {
-    this.isRunning = false;
-    clearTimeout(this.asteroidTimeout);
-    console.log('stopped');
-  }
+    if (this.state.isRunning) {
+      clearTimeout(this._asteroidTimeout);
 
-  update({ delta, app }: { delta: number; app: App }) {
+      this._asteroidTimeout = setTimeout(this.start, Math.random() * this.state.frequency + 300);
+    }
+  };
+
+  stop = () => {
+    this.state.isRunning = false;
+    clearTimeout(this._asteroidTimeout);
+  };
+
+  update = ({ delta, app }: { delta: number; app: App }) => {
     this.asteroids.forEach((asteroid) => {
       asteroid.update({ delta, app });
     });
-  }
+  };
 }

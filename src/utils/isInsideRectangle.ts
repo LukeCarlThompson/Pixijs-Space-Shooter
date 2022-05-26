@@ -1,12 +1,11 @@
-import type * as PIXI from 'pixi.js';
-
 interface IsInsideRectangleProps {
   x: number;
   y: number;
-  rectangle: PIXI.Rectangle;
+  width: number;
+  height: number;
 }
-export const isInsideRectangle = ({ x, y, rectangle }: IsInsideRectangleProps) => {
-  const outsideRectX = x > rectangle.width || x < 0;
-  const outsideRectY = y > rectangle.height || y < 0;
+export const isInsideRectangle = ({ x, y, width, height }: IsInsideRectangleProps) => {
+  const outsideRectX = x > width || x < 0;
+  const outsideRectY = y > height || y < 0;
   return !(outsideRectX || outsideRectY);
 };
