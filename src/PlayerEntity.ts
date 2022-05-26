@@ -28,10 +28,19 @@ export class PlayerEntity {
 
     // center the sprite's anchor point
     ship.anchor.set(50, 60);
-    ship.x = app.pixi.screen.width / 2;
-    ship.y = app.pixi.screen.height / 2;
-    app.state.playerX = app.pixi.screen.width / 2;
-    app.state.playerY = app.pixi.screen.height / 2;
+
+    // Center this ship
+    const centerX = app.pixi.screen.width / 2;
+    const centerY = app.pixi.screen.height / 2;
+    ship.x = centerX;
+    ship.y = centerY;
+    app.state.playerX = centerX;
+    app.state.playerY = centerY;
+
+    this.#prevPosition = {
+      x: centerX,
+      y: centerY,
+    };
 
     ship.zIndex = 10;
 
@@ -46,6 +55,7 @@ export class PlayerEntity {
 
     this.shootInterval = 0;
 
+    // TODO: fix memory leak when shooting
     const shootBullet = () => {
       this.shoot(app);
     };
@@ -67,6 +77,8 @@ export class PlayerEntity {
   entity;
   bullets: BulletEntity[];
   shootInterval: number;
+  velocity: { x: number; y: number } = { x: 0, y: 0 };
+  #prevPosition: { x: number; y: number } = { x: 0, y: 0 };
 
   shoot(app: App) {
     this.bullets.push(new BulletEntity(15, this.entity.rotation - 1.5, app));
@@ -90,8 +102,16 @@ export class PlayerEntity {
     this.entity.position.x = currentPositionX;
     this.entity.position.y = currentPositionY;
 
+    // Update velocity state
+    this.velocity = { x: currentPositionX - this.#prevPosition.x, y: currentPositionY - this.#prevPosition.y };
+
+    // Update prev position
+    this.#prevPosition.x = currentPositionX;
+    this.#prevPosition.y = currentPositionY;
+
     // Point ship towards mouse
     const wobble = Math.sin(Date.now() * 0.005) * 0.05 * -0.5;
+
     // TODO: Normalise the angle when it loops so I can lerp the values
     const angleToMouse = getAngleBetweenTwoPoints(
       app.state.mouseX,

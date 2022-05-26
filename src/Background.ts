@@ -17,15 +17,10 @@ export class BackgroundEntity {
   }
 
   entity;
-  ticker = 0;
 
   update({ delta, app }: { delta: number; app: App }) {
-    this.entity.tilePosition.x = (this.ticker + app.player.entity.position.x) * -0.2;
-    this.entity.tilePosition.y = (this.ticker + app.player.entity.position.y) * -0.2;
-
-    // TODO: Figure out why using delta properly actually causes jittering instead of preventing it.
-
-    this.ticker++;
+    this.entity.tilePosition.x = this.entity.tilePosition.x + (app.player.velocity.x * -0.2 + 0.1) * delta;
+    this.entity.tilePosition.y = this.entity.tilePosition.y + (app.player.velocity.y * -0.2 + 0.25) * delta;
 
     this.entity.width = app.pixi.screen.width;
     this.entity.height = app.pixi.screen.height;
