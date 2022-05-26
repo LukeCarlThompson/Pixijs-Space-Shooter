@@ -39,6 +39,7 @@ export class BulletEntity {
   destroy(app: App) {
     app.pixi.stage.removeChild(this.entity);
     app.player.bullets = app.player.bullets.filter((item) => item !== this);
+    this.entity.destroy();
   }
 
   update({ delta, app }: { delta: number; app: App }) {
