@@ -37,7 +37,7 @@ export class PlayerEntity {
     app.state.playerX = centerX;
     app.state.playerY = centerY;
 
-    this.#prevPosition = {
+    this._prevPosition = {
       x: centerX,
       y: centerY,
     };
@@ -78,7 +78,7 @@ export class PlayerEntity {
   bullets: BulletEntity[];
   shootInterval: number;
   velocity: { x: number; y: number } = { x: 0, y: 0 };
-  #prevPosition: { x: number; y: number } = { x: 0, y: 0 };
+  _prevPosition: { x: number; y: number } = { x: 0, y: 0 };
 
   shoot(app: App) {
     this.bullets.push(new BulletEntity(15, this.entity.rotation - 1.5, app));
@@ -103,14 +103,13 @@ export class PlayerEntity {
     this.entity.position.y = currentPositionY;
 
     // Update velocity state
-    this.velocity = { x: currentPositionX - this.#prevPosition.x, y: currentPositionY - this.#prevPosition.y };
+    this.velocity = { x: currentPositionX - this._prevPosition.x, y: currentPositionY - this._prevPosition.y };
 
     // Update prev position
-    this.#prevPosition.x = currentPositionX;
-    this.#prevPosition.y = currentPositionY;
+    this._prevPosition.x = currentPositionX;
+    this._prevPosition.y = currentPositionY;
 
     // Point ship towards mouse
-    const wobble = Math.sin(Date.now() * 0.005) * 0.05 * -0.5;
 
     // TODO: Normalise the angle when it loops so I can lerp the values
     const angleToMouse = getAngleBetweenTwoPoints(
@@ -120,7 +119,7 @@ export class PlayerEntity {
       currentPositionY,
     );
     app.state.playerAngleToMouse = angleToMouse;
-    this.entity.rotation = app.state.playerAngleToMouse + 1.5 + wobble;
+    this.entity.rotation = app.state.playerAngleToMouse + 1.5;
 
     // Move ship if thrust is above 0
     app.state.playerX += getAngleX(app.state.thrust, app.state.thrustAngle);
