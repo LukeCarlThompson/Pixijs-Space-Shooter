@@ -57,6 +57,7 @@ export class Asteroid {
     this.destroy = () => {
       app.asteroidGenerator.asteroids = app.asteroidGenerator.asteroids.filter((asteroid) => asteroid !== this);
       app.pixi.stage.removeChild(this.entity);
+      this.entity.destroy();
     };
   }
 

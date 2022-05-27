@@ -157,7 +157,7 @@ export class PlayerEntity {
 
     // Update the bullets
     this.bullets.forEach((bullet) => {
-      bullet.update({ delta, app });
+      bullet.update(delta);
     });
   };
 }
