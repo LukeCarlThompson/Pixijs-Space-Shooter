@@ -3,6 +3,7 @@ import type { App } from './App';
 import { getAngleBetweenTwoPoints, getAngleX, getAngleY } from './utils/getAngle';
 import { getRandomInt } from './utils/getRandomRange';
 import { isInsideRectangle } from './utils/isInsideRectangle';
+import { Explosion } from './Explosion';
 
 interface AsteroidProps {
   position?: { x: number; y: number };
@@ -17,6 +18,10 @@ const spriteRows = 8;
 
 export class Asteroid {
   constructor({ position = { x: 0, y: 0 }, speed = 2, rotationSpeed = Math.random(), app }: AsteroidProps) {
+    this.state = {
+      exploding: false,
+    };
+
     this.speed = speed;
     this.rotationSpeed = rotationSpeed;
     this.canBeDestroyed = false;
@@ -24,6 +29,10 @@ export class Asteroid {
     setTimeout(() => {
       this.canBeDestroyed = true;
     }, 2000);
+
+    const container = new PIXI.Container();
+
+    this.container = container;
 
     const texture = app.pixi.loader.resources.asteroid.texture?.clone() || PIXI.Texture.EMPTY;
     texture.frame.x = spriteRowSize * getRandomInt(0, 7);
@@ -50,24 +59,45 @@ export class Asteroid {
 
     this.direction = angleToPlayer + (Math.random() - 0.5) * 0.5;
 
+    //TODO: Remove this entity property in favour of container??
     this.entity = sprite;
 
-    app.pixi.stage.addChild(sprite);
+    this.container.addChild(sprite);
+
+    app.pixi.stage.addChild(this.container);
+
+    // sprite.addChild(app.explosion.entity);
+
+    this.explosion = null;
+
+    this.explode = () => {
+      this.container.zIndex = 9;
+      // Create a new explosion
+      this.explosion = new Explosion(app);
+      this.explosion.entity.position.set(this.entity.width / 2, this.entity.height / 2);
+      this.state.exploding = true;
+      this.container.addChild(this.explosion.entity);
+      // console.log('children -->', this.entity.children);
+    };
 
     this.destroy = () => {
       app.asteroidGenerator.asteroids = app.asteroidGenerator.asteroids.filter((asteroid) => asteroid !== this);
-      app.pixi.stage.removeChild(this.entity);
-      this.entity.destroy({ children: true, texture: false, baseTexture: true });
+      app.pixi.stage.removeChild(this.container);
+      this.container.destroy({ children: true, texture: false, baseTexture: true });
     };
   }
 
   entity;
+  state;
   speed;
   direction;
   rotationSpeed;
   canBeDestroyed = false;
   isInsideViewport = false;
   destroy;
+  explosion: Explosion | null;
+  explode;
+  container;
 
   update({ delta, app }: { delta: number; app: App }) {
     // Update position from app state
@@ -88,6 +118,16 @@ export class Asteroid {
 
     if (this.canBeDestroyed && !this.isInsideViewport) {
       this.destroy();
+    }
+
+    if ((this.state.exploding = true && this.explosion !== null)) {
+      this.explosion.update({ delta, position: { x: this.entity.position.x, y: this.entity.position.y } });
+      if (this.explosion.state.step > 5) {
+        this.entity.visible = false;
+      }
+      if (this.explosion.state.finished) {
+        this.destroy();
+      }
     }
   }
 }

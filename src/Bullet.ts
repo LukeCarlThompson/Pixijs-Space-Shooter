@@ -60,10 +60,18 @@ export class Bullet {
 
     this.update = (delta: number) => {
       const hitItems = this.hitTest();
+      let stopUpdate = false;
       if (hitItems.length > 0) {
-        this.destroy();
-        hitItems.forEach((item) => item.destroy());
-        return;
+        hitItems.forEach((item) => {
+          // item.destroy()
+          if (!item.state.exploding) {
+            this.destroy();
+            item.explode();
+            stopUpdate = true;
+          }
+        });
+
+        if (stopUpdate) return;
       }
 
       // Update position from app state

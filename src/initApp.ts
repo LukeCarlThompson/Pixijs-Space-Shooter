@@ -2,6 +2,7 @@ import * as PIXI from 'pixi.js';
 import asteroidImagePath from './images/asteroids.png';
 import shipImagePath from './images/Spaceship_Asset.png';
 import bgImagePath from './images/Blue_Nebula_5.png';
+import explosionImagePath from './images/circle_explosion.png';
 import { App } from './App';
 
 declare global {
@@ -29,7 +30,7 @@ const createPixi = (parentEl: HTMLDivElement) => {
   return pixiInstance;
 };
 
-export const initApp = async () => {
+export const initApp = () => {
   if (canvas === null) return;
 
   // TODO: Show something before the assets have loaded
@@ -56,5 +57,6 @@ export const initApp = async () => {
   textureLoader.add('asteroid', asteroidImagePath);
   textureLoader.add('ship', shipImagePath);
   textureLoader.add('background', bgImagePath);
+  textureLoader.add('explosion', explosionImagePath);
   textureLoader.load();
 };
