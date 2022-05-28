@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js';
 import type { App } from './App';
+import { lerp } from './utils/lerp';
 
 const spriteCoords = {
   width: 256,
@@ -51,6 +52,9 @@ export class Explosion {
         this.state.step++;
         this.texture.frame.x = spriteCoords.width * this.state.step;
         this.texture.updateUvs();
+      }
+      if (this.state.step > 2) {
+        this.entity.alpha = lerp(1, 0, 0.2);
       }
     } else {
       this.state.step = 0;

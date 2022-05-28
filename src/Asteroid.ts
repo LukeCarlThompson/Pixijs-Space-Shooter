@@ -24,13 +24,14 @@ export class Asteroid {
       direction: direction,
       exploding: false,
       health: 20,
+      takingDamage: false,
     };
 
     this.canBeDestroyed = false;
 
     setTimeout(() => {
       this.canBeDestroyed = true;
-    }, 2000);
+    }, 5000);
 
     const container = new PIXI.Container();
 
@@ -61,6 +62,16 @@ export class Asteroid {
 
     this.explosion = null;
 
+    this.takeDamage = ({ damage }: { damage: number }) => {
+      this.state.health -= damage;
+      this.state.speed = this.state.speed * 0.65;
+      this.state.takingDamage = true;
+      this.entity.tint = 0xff8359;
+      if (this.state.health <= 0) {
+        this.explode();
+      }
+    };
+
     this.explode = () => {
       this.container.zIndex = 9;
       // Create a new explosion
@@ -81,6 +92,7 @@ export class Asteroid {
   state;
   canBeDestroyed = false;
   isInsideViewport = false;
+  takeDamage;
   destroy;
   explosion: Explosion | null;
   explode;
@@ -104,16 +116,24 @@ export class Asteroid {
       this.canBeDestroyed = true;
     }
 
+    if (!this.state.takingDamage) {
+      this.entity.tint = 0xffffff;
+    }
+
+    this.state.takingDamage = false;
+
     if (this.canBeDestroyed && !this.isInsideViewport) {
       this.destroy();
     }
 
     if ((this.state.exploding = true && this.explosion !== null)) {
       this.explosion.update({ delta, position: { x: this.entity.position.x, y: this.entity.position.y } });
+
       if (this.explosion.state.step > 2) {
-        this.entity.scale.set(lerp(this.entity.scale.x, 0.75, 0.3));
+        this.entity.scale.set(lerp(this.entity.scale.x, 0.75, 0.2));
+        this.entity.alpha = lerp(1, 0, 0.75);
       }
-      if (this.explosion.state.step > 5) {
+      if (this.explosion.state.step > 7) {
         this.entity.visible = false;
       }
       if (this.explosion.state.finished) {

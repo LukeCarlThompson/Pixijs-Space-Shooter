@@ -20,7 +20,7 @@ export class Bullet {
       speed: speed,
       direction: direction,
       destroyed: false,
-      damage: 10,
+      damage: 7,
     };
 
     const texture = app.pixi.renderer.generateTexture(graphic);
@@ -71,9 +71,8 @@ export class Bullet {
 
         // Update the items that were hit
         hitItems.forEach((item) => {
-          item.state.speed = item.state.speed * 0.75;
           if (!item.state.exploding) {
-            item.explode();
+            item.takeDamage({ damage: this.state.damage });
             destroyBullet = true;
           }
         });
