@@ -25,10 +25,8 @@ export class Explosion {
     this.texture = texture;
     const sprite = PIXI.Sprite.from(texture);
     sprite.anchor.set(0.5);
-    sprite.scale.set(2);
+    sprite.scale.set(0.5);
     sprite.name = 'Explosion';
-
-    console.log(sprite);
 
     this.entity = sprite;
 
@@ -53,7 +51,6 @@ export class Explosion {
         this.state.step++;
         this.texture.frame.x = spriteCoords.width * this.state.step;
         this.texture.updateUvs();
-        // console.log('step -->', this.state.step);
       }
     } else {
       this.state.step = 0;

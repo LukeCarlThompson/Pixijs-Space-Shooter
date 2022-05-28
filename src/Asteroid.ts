@@ -4,6 +4,7 @@ import { getAngleBetweenTwoPoints, getAngleX, getAngleY } from './utils/getAngle
 import { getRandomInt } from './utils/getRandomRange';
 import { isInsideRectangle } from './utils/isInsideRectangle';
 import { Explosion } from './Explosion';
+import { lerp } from './utils/lerp';
 
 interface AsteroidProps {
   position?: { x: number; y: number };
@@ -77,7 +78,6 @@ export class Asteroid {
       this.explosion.entity.position.set(this.entity.width / 2, this.entity.height / 2);
       this.state.exploding = true;
       this.container.addChild(this.explosion.entity);
-      // console.log('children -->', this.entity.children);
     };
 
     this.destroy = () => {
@@ -122,6 +122,9 @@ export class Asteroid {
 
     if ((this.state.exploding = true && this.explosion !== null)) {
       this.explosion.update({ delta, position: { x: this.entity.position.x, y: this.entity.position.y } });
+      if (this.explosion.state.step > 2) {
+        this.entity.scale.set(lerp(this.entity.scale.x, 0.75, 0.3));
+      }
       if (this.explosion.state.step > 5) {
         this.entity.visible = false;
       }
