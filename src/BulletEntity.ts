@@ -4,23 +4,25 @@ import { getAngleX, getAngleY } from './utils/getAngle';
 import { isInsideRectangle } from './utils/isInsideRectangle';
 import Victor from 'victor';
 
+// create a new graphic
+const graphic = new PIXI.Graphics();
+graphic.lineStyle(1, 0x00ff00, 1);
+graphic.beginFill(0xccffcc);
+graphic.drawRoundedRect(-10, -1, 3, 1, 2);
+graphic.drawRoundedRect(-5, -1, 5, 2, 2);
+graphic.drawRoundedRect(3, -2, 10, 4, 2);
+graphic.endFill();
+graphic.name = 'Bullet';
+
 export class BulletEntity {
   constructor(speed: number, direction: number, app: App) {
     this.speed = speed;
-
-    // create a new graphic
-    const graphic = new PIXI.Graphics();
-    graphic.lineStyle(1, 0x00ff00, 1);
-    graphic.beginFill(0xccffcc);
-    graphic.drawRoundedRect(-10, -1, 3, 1, 2);
-    graphic.drawRoundedRect(-5, -1, 5, 2, 2);
-    graphic.drawRoundedRect(3, -2, 10, 4, 2);
-    graphic.endFill();
 
     const texture = app.pixi.renderer.generateTexture(graphic);
     const sprite = new PIXI.Sprite(texture);
     sprite.x = app.player.entity.x;
     sprite.y = app.player.entity.y;
+    sprite.name = 'Bullet';
 
     // Orient the bullet
     const randomAdjustment = (Math.random() - 0.5) * 0.01;
@@ -34,7 +36,7 @@ export class BulletEntity {
     this.destroy = () => {
       app.player.bullets = app.player.bullets.filter((item) => item !== this);
       app.pixi.stage.removeChild(this.entity);
-      this.entity.destroy();
+      this.entity.destroy(true);
     };
 
     this.hitTest = () => {
