@@ -99,7 +99,6 @@ export class PlayerEntity {
   shoot;
 
   increaseThrust = () => {
-    this.state.thrustAngle = this.state.angleToMouse;
     this.state.thrust++;
   };
 
