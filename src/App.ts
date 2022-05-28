@@ -20,7 +20,7 @@ export class App {
     this.background = new BackgroundEntity(this);
 
     // Create our player and add to the scene
-    this.player = new Player(this);
+    this.player = new Player({ app: this });
 
     // Start the asteroid generator
     this.asteroidGenerator = new AsteroidGenerator({ app: this, frequency: 2000 });

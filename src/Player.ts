@@ -16,10 +16,17 @@ const constants = {
   maxLevel: 3,
 };
 
+interface PlayerProps {
+  app: App;
+  health?: number;
+}
+
 export class Player {
-  constructor(app: App) {
+  constructor({ app, health = 100 }: PlayerProps) {
     // Set up some state
     this.state = {
+      health: health,
+      maxHealth: health,
       velocity: { x: 0, y: 0 },
       idealPosition: { x: app.pixi.screen.width / 2, y: app.pixi.screen.height / 2 },
       prevPosition: {
