@@ -9,6 +9,7 @@ import { lerp } from './utils/lerp';
 interface AsteroidProps {
   position?: { x: number; y: number };
   speed?: number;
+  health?: number;
   direction?: number;
   app: App;
 }
@@ -18,12 +19,19 @@ const spriteRowSize = 247;
 const spriteRows = 8;
 
 export class Asteroid {
-  constructor({ position = { x: 0, y: 0 }, direction = 1.5, speed = 2, app }: AsteroidProps) {
+  constructor({
+    position = { x: 0, y: 0 },
+    direction = 1.5,
+    health = getRandomInt(5, 30),
+    speed = 2,
+    app,
+  }: AsteroidProps) {
     this.state = {
       speed: speed,
       direction: direction,
       exploding: false,
-      health: 20,
+      health: health,
+      maxHealth: health,
       takingDamage: false,
     };
 
