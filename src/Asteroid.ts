@@ -33,32 +33,31 @@ export class Asteroid {
     texture.updateUvs();
 
     // create a new Sprite from texture
-    const asteroid = new PIXI.Sprite(texture);
-    asteroid.position.x = position.x;
-    asteroid.position.y = position.y;
-    asteroid.anchor.set(0.5);
-    asteroid.scale.set(0.5);
-
-    // Orient the asteroid
-    asteroid.rotation = 1;
+    const sprite = new PIXI.Sprite(texture);
+    sprite.position.x = position.x;
+    sprite.position.y = position.y;
+    sprite.anchor.set(0.5);
+    sprite.scale.set(0.5);
+    sprite.rotation = 1;
+    sprite.name = 'Asteroid';
 
     const angleToPlayer = getAngleBetweenTwoPoints(
       app.player.entity.position.x,
       app.player.entity.position.y,
-      asteroid.position.x,
-      asteroid.position.y,
+      sprite.position.x,
+      sprite.position.y,
     );
 
     this.direction = angleToPlayer + (Math.random() - 0.5) * 0.5;
 
-    this.entity = asteroid;
+    this.entity = sprite;
 
-    app.pixi.stage.addChild(asteroid);
+    app.pixi.stage.addChild(sprite);
 
     this.destroy = () => {
       app.asteroidGenerator.asteroids = app.asteroidGenerator.asteroids.filter((asteroid) => asteroid !== this);
       app.pixi.stage.removeChild(this.entity);
-      this.entity.destroy();
+      this.entity.destroy({ children: true, texture: false, baseTexture: true });
     };
   }
 
