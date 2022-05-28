@@ -4,6 +4,12 @@ import shipImagePath from './images/Spaceship_Asset.png';
 import bgImagePath from './images/Blue_Nebula_5.png';
 import { App } from './App';
 
+declare global {
+  interface Window {
+    PIXI: any;
+  }
+}
+
 const canvas = document.querySelector<HTMLDivElement>('#canvas');
 
 const createPixi = (parentEl: HTMLDivElement) => {
@@ -37,7 +43,7 @@ export const initApp = async () => {
 
     // Add pixi to window for devtools
     // TODO: Set this up to only run in dev mode
-    window.PIXI = pixi;
+    window.PIXI = PIXI;
   });
 
   // TODO: Make a loading indicator that uses app.pixi.loader.progress
