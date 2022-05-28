@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 import type { App } from './App';
-import { getAngleBetweenTwoPoints, getAngleX, getAngleY } from './utils/getAngle';
+import { getAngleX, getAngleY } from './utils/getAngle';
 import { getRandomInt } from './utils/getRandomRange';
 import { isInsideRectangle } from './utils/isInsideRectangle';
 import { Explosion } from './Explosion';
@@ -9,7 +9,7 @@ import { lerp } from './utils/lerp';
 interface AsteroidProps {
   position?: { x: number; y: number };
   speed?: number;
-  rotationSpeed?: number;
+  direction?: number;
   app: App;
 }
 
@@ -18,13 +18,14 @@ const spriteRowSize = 247;
 const spriteRows = 8;
 
 export class Asteroid {
-  constructor({ position = { x: 0, y: 0 }, speed = 2, rotationSpeed = Math.random(), app }: AsteroidProps) {
+  constructor({ position = { x: 0, y: 0 }, direction = 1.5, speed = 2, app }: AsteroidProps) {
     this.state = {
+      speed: speed,
+      direction: direction,
       exploding: false,
+      health: 20,
     };
 
-    this.speed = speed;
-    this.rotationSpeed = rotationSpeed;
     this.canBeDestroyed = false;
 
     setTimeout(() => {
@@ -51,23 +52,12 @@ export class Asteroid {
     sprite.rotation = 1;
     sprite.name = 'Asteroid';
 
-    const angleToPlayer = getAngleBetweenTwoPoints(
-      app.player.entity.position.x,
-      app.player.entity.position.y,
-      sprite.position.x,
-      sprite.position.y,
-    );
-
-    this.direction = angleToPlayer + (Math.random() - 0.5) * 0.5;
-
     //TODO: Remove this entity property in favour of container??
     this.entity = sprite;
 
     this.container.addChild(sprite);
 
     app.pixi.stage.addChild(this.container);
-
-    // sprite.addChild(app.explosion.entity);
 
     this.explosion = null;
 
@@ -89,9 +79,6 @@ export class Asteroid {
 
   entity;
   state;
-  speed;
-  direction;
-  rotationSpeed;
   canBeDestroyed = false;
   isInsideViewport = false;
   destroy;
@@ -100,9 +87,10 @@ export class Asteroid {
   container;
 
   update({ delta, app }: { delta: number; app: App }) {
+    const { speed, direction } = this.state;
     // Update position from app state
-    this.entity.x += getAngleX(this.speed, this.direction) * delta;
-    this.entity.y += getAngleY(this.speed, this.direction) * delta;
+    this.entity.x += getAngleX(speed, direction) * delta;
+    this.entity.y += getAngleY(speed, direction) * delta;
 
     // Check if it is still on the screen
     this.isInsideViewport = isInsideRectangle({

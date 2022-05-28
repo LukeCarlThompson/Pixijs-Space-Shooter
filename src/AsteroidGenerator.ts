@@ -1,6 +1,7 @@
 import type { App } from './App';
 import { getRandomArbitrary } from './utils/getRandomRange';
 import { Asteroid } from './Asteroid';
+import { getAngleBetweenTwoPoints } from './utils/getAngle';
 
 interface AsteroidGeneratorProps {
   app: App;
@@ -16,7 +17,18 @@ export class AsteroidGenerator {
     };
 
     this.createAsteroid = () => {
-      const newAsteroid = new Asteroid({ position: { x: getRandomArbitrary(0, app.pixi.screen.width), y: -100 }, app });
+      const posX = getRandomArbitrary(0, app.pixi.screen.width);
+      const posY = -100;
+      const speed = getRandomArbitrary(1, 3);
+      const angleToPlayer = getAngleBetweenTwoPoints(
+        app.player.entity.position.x,
+        app.player.entity.position.y,
+        posX,
+        posY,
+      );
+
+      const newAsteroid = new Asteroid({ position: { x: posX, y: posY }, speed, direction: angleToPlayer, app });
+
       this.asteroids.push(newAsteroid);
     };
   }
