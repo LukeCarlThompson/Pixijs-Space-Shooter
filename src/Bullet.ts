@@ -16,7 +16,11 @@ graphic.name = 'Bullet';
 
 export class Bullet {
   constructor(speed: number, direction: number, app: App) {
-    this.speed = speed;
+    this.state = {
+      speed: speed,
+      direction: direction,
+      destroyed: false,
+    };
 
     const texture = app.pixi.renderer.generateTexture(graphic);
     const sprite = new PIXI.Sprite(texture);
@@ -27,13 +31,14 @@ export class Bullet {
     // Orient the bullet
     const randomAdjustment = (Math.random() - 0.5) * 0.01;
     sprite.rotation = direction + randomAdjustment;
-    this.direction = direction + randomAdjustment;
+    this.state.direction = direction + randomAdjustment;
 
     this.entity = sprite;
 
     app.pixi.stage.addChild(sprite);
 
     this.destroy = () => {
+      this.state.destroyed = true;
       app.player.bullets = app.player.bullets.filter((item) => item !== this);
       app.pixi.stage.removeChild(this.entity);
       this.entity.destroy(true);
@@ -60,23 +65,24 @@ export class Bullet {
 
     this.update = (delta: number) => {
       const hitItems = this.hitTest();
-      let stopUpdate = false;
       if (hitItems.length > 0) {
+        // Destroy the bullet
+        this.destroy();
+
+        // Update the items that were hit
         hitItems.forEach((item) => {
-          // item.destroy()
+          item.speed = item.speed * 0.5;
           if (!item.state.exploding) {
-            this.destroy();
             item.explode();
-            stopUpdate = true;
           }
         });
-
-        if (stopUpdate) return;
       }
 
+      if (this.state.destroyed) return;
+
       // Update position from app state
-      this.entity.x += getAngleX(this.speed, this.direction) * delta;
-      this.entity.y += getAngleY(this.speed, this.direction) * delta;
+      this.entity.x += getAngleX(this.state.speed, this.state.direction) * delta;
+      this.entity.y += getAngleY(this.state.speed, this.state.direction) * delta;
 
       // Check if it is still on the screen
       const isOutOfViewport = !isInsideRectangle({
@@ -93,8 +99,7 @@ export class Bullet {
   }
 
   entity;
-  direction;
-  speed;
+  state;
   hitTest;
   destroy;
   update;
