@@ -3,7 +3,7 @@ import { lerp } from './utils/lerp';
 import type { App } from './App';
 import { getAngleX, getAngleY } from './utils/getAngle';
 import { getAngleBetweenTwoPoints } from './utils/getAngle';
-import { BulletEntity } from './BulletEntity';
+import { Bullet } from './Bullet';
 import { playerKeyboardEvents } from './playerKeyboardEvents';
 
 const spriteCoords = {
@@ -68,7 +68,7 @@ export class PlayerEntity {
     app.pixi.stage.addChild(ship);
 
     this.shoot = () => {
-      this.bullets.push(new BulletEntity(15, this.entity.rotation - 1.5, app));
+      this.bullets.push(new Bullet(15, this.entity.rotation - 1.5, app));
     };
 
     // Create an array for the bullets
@@ -93,7 +93,7 @@ export class PlayerEntity {
 
   texture;
   entity;
-  bullets: BulletEntity[];
+  bullets: Bullet[];
   state;
   _shootInterval: number;
   shoot;

@@ -14,7 +14,7 @@ graphic.drawRoundedRect(3, -2, 10, 4, 2);
 graphic.endFill();
 graphic.name = 'Bullet';
 
-export class BulletEntity {
+export class Bullet {
   constructor(speed: number, direction: number, app: App) {
     this.speed = speed;
 
