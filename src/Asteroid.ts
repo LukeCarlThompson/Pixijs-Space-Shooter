@@ -26,7 +26,6 @@ export class Asteroid {
     }, 2000);
 
     const texture = app.pixi.loader.resources.asteroid.texture?.clone() || PIXI.Texture.EMPTY;
-    texture.trim = new PIXI.Rectangle(0, 0, 100, 100);
     texture.frame.x = spriteRowSize * getRandomInt(0, 7);
     texture.frame.y = spriteRowSize * getRandomInt(0, 7);
     texture.frame.width = spriteDimension;
@@ -37,6 +36,8 @@ export class Asteroid {
     const asteroid = new PIXI.Sprite(texture);
     asteroid.position.x = position.x;
     asteroid.position.y = position.y;
+    asteroid.anchor.set(0.5);
+    asteroid.scale.set(0.5);
 
     // Orient the asteroid
     asteroid.rotation = 1;
