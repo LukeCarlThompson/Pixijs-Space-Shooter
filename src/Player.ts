@@ -16,7 +16,7 @@ const constants = {
   maxLevel: 3,
 };
 
-export class PlayerEntity {
+export class Player {
   constructor(app: App) {
     // Set up some state
     this.state = {

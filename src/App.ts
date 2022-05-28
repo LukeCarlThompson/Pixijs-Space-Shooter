@@ -2,7 +2,7 @@ import './style.css';
 
 import * as PIXI from 'pixi.js';
 import Stats from 'stats.js';
-import { PlayerEntity } from './PlayerEntity';
+import { Player } from './Player';
 import { BackgroundEntity } from './Background';
 import { mouseMoveEvents } from './mouseMoveEvents';
 import { AsteroidGenerator } from './AsteroidGenerator';
@@ -20,7 +20,7 @@ export class App {
     this.background = new BackgroundEntity(this);
 
     // Create our player and add to the scene
-    this.player = new PlayerEntity(this);
+    this.player = new Player(this);
 
     // Start the asteroid generator
     this.asteroidGenerator = new AsteroidGenerator({ app: this, frequency: 2000 });
