@@ -46,7 +46,7 @@ export class BulletEntity {
         const asteroidVec = new Victor(asteroid.entity.x, asteroid.entity.y);
 
         const distanceBetween = bulletVec.distance(asteroidVec);
-        const asteroidRadius = 50;
+        const asteroidRadius = asteroid.entity.width / 2;
 
         const didHit = distanceBetween < asteroidRadius;
 
