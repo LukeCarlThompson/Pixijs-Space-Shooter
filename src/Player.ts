@@ -13,7 +13,7 @@ const spriteCoords = {
 
 const constants = {
   maxThrust: 10,
-  maxLevel: 3,
+  maxLevel: 2,
 };
 
 interface PlayerProps {
@@ -35,6 +35,14 @@ export class Player {
       },
       angleToMouse: 0,
       thrustAngle: 1.5,
+      _score: 0,
+      get score() {
+        return this._score;
+      },
+      set score(value: number) {
+        this._score = value;
+        this.level = Math.trunc(value * 0.1);
+      },
       _thrust: 0,
       get thrust() {
         return this._thrust;
@@ -48,7 +56,7 @@ export class Player {
         return this._level;
       },
       set level(value: number) {
-        value <= constants.maxLevel ? (this._level = value) : null;
+        this._level = value <= constants.maxLevel ? value : constants.maxLevel;
       },
     };
 
@@ -118,6 +126,7 @@ export class Player {
   };
 
   update = ({ delta, app }: { delta: number; app: App }) => {
+    console.log('level -->', this.state.level);
     // Update sprites if thrust has changed
     const limitedThrust =
       this.state.thrust >= spriteCoords.x.length - 1 ? spriteCoords.x.length - 1 : this.state.thrust;

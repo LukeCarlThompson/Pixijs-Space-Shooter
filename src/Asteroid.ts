@@ -77,6 +77,7 @@ export class Asteroid {
       this.entity.tint = 0xff8359;
       if (this.state.health <= 0) {
         this.explode();
+        app.player.state.score++;
       }
     };
 
