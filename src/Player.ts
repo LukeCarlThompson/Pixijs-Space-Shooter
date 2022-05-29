@@ -126,7 +126,6 @@ export class Player {
   };
 
   update = ({ delta, app }: { delta: number; app: App }) => {
-    console.log('level -->', this.state.level);
     // Update sprites if thrust has changed
     const limitedThrust =
       this.state.thrust >= spriteCoords.x.length - 1 ? spriteCoords.x.length - 1 : this.state.thrust;
