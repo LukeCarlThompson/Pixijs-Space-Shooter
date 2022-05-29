@@ -16,7 +16,7 @@ interface AsteroidProps {
 
 const spriteDimension = 247;
 const spriteRowSize = 247;
-const spriteRows = 8;
+// const spriteRows = 8;
 
 export class Asteroid {
   constructor({
