@@ -4,6 +4,7 @@ import shipImagePath from './images/Spaceship_Asset.png';
 import bgImagePath from './images/Blue_Nebula_5.png';
 import explosionImagePath from './images/circle_explosion.png';
 import { App } from './App';
+import { loadTexturesAsync } from './loadTexturesAsync';
 
 declare global {
   interface Window {
@@ -30,33 +31,34 @@ const createPixi = (parentEl: HTMLDivElement) => {
   return pixiInstance;
 };
 
-export const initApp = () => {
+export const initApp = async () => {
   if (canvas === null) return;
 
   // TODO: Show something before the assets have loaded
 
   const pixi = createPixi(canvas);
 
-  const textureLoader = pixi.loader;
+  const textures = [
+    { name: 'asteroid', url: asteroidImagePath },
+    { name: 'ship', url: shipImagePath },
+    { name: 'background', url: bgImagePath },
+    { name: 'explosion', url: explosionImagePath },
+    { name: 'error', url: '/error.png' },
+  ];
 
-  textureLoader.onComplete.add(() => {
-    new App(pixi);
+  const onProgress = (loader: PIXI.Loader) => {
+    // TODO: build a loading bar
+    console.log(loader.progress);
+  };
 
-    // Add pixi to window for devtools
-    // TODO: Set this up to only run in dev mode
-    window.PIXI = PIXI;
-  });
-
-  // TODO: Make a loading indicator that uses app.pixi.loader.progress
-
-  textureLoader.onError.add((e) => {
+  await loadTexturesAsync({ textures, loader: pixi.loader, onProgress }).catch((error) => {
     // TODO: How to handle errors?
-    console.log('loading error -->', e);
+    console.error(error);
   });
 
-  textureLoader.add('asteroid', asteroidImagePath);
-  textureLoader.add('ship', shipImagePath);
-  textureLoader.add('background', bgImagePath);
-  textureLoader.add('explosion', explosionImagePath);
-  textureLoader.load();
+  new App(pixi);
+
+  // Add pixi to window for devtools
+  // TODO: Set this up to only run in dev mode
+  window.PIXI = PIXI;
 };
