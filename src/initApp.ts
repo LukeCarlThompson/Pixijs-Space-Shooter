@@ -16,7 +16,7 @@ const canvas = document.querySelector<HTMLDivElement>('#canvas');
 
 const createPixi = (parentEl: HTMLDivElement) => {
   const config = {
-    backgroundColor: 0x1099bb,
+    backgroundColor: 0x000000,
     resizeTo: parentEl,
     resolution: window.devicePixelRatio || 1,
     autoDensity: true,
