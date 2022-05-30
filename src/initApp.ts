@@ -43,7 +43,6 @@ export const initApp = async () => {
     { name: 'ship', url: shipImagePath },
     { name: 'background', url: bgImagePath },
     { name: 'explosion', url: explosionImagePath },
-    { name: 'error', url: '/error.png' },
   ];
 
   const onProgress = (loader: PIXI.Loader) => {
